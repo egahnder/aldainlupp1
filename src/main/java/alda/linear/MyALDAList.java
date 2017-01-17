@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 public class MyALDAList<E> implements ALDAList<E> {
 
+    // --------------- The Node class -----------------------------------------
     private static class Node<E> {
         E data;
         Node<E> next;
@@ -13,17 +14,28 @@ public class MyALDAList<E> implements ALDAList<E> {
         }
     }
 
+
+    // --------------- MyADLAList class ---------------------------------------
+
+    // --------------- Variables ----------------------------------------------
+
     private Node<E> first;
     private Node<E> last;
-    private int size = 0;
+
+    // --------------- Methods ------------------------------------------------
+
+    @Override
+    public Iterator<E> iterator() {
+        return new MyALDAListIterator<>();
+    }
 
     private Node<E> getNode(int index) {
+
+        Node<E> tempNode = first;
 
         if (index < 0 || index >= size()) {
             throw new IndexOutOfBoundsException();
         }
-
-        Node<E> tempNode = first;
 
         if (index == 0) {
             return first;
@@ -37,117 +49,98 @@ public class MyALDAList<E> implements ALDAList<E> {
 
     }
 
-
     @Override
-    public Iterator<E> iterator() {
-        return new MyALDAListIterator<>();
-    }
-
-
     public void add(E element) {
         if (first == null) {
             first = new Node<>(element);
             last = first;
-            size++;
 
         } else {
             last.next = new Node<>(element);
             last = last.next;
-            size++;
         }
 
     }
 
     @Override
     public void add(int index, E element) {
+
+        Node<E> newNode = new Node<>(element);
+        Node<E> tempNode = first;
+
         if (index < 0 || index > size()) {
             throw new IndexOutOfBoundsException();
         }
 
         if (index == size()) {
             add(element);
-        } else {
-
-            Node<E> newNode = new Node<>(element);
-            Node<E> tempNode = first;
-
-            if (index == 0) {
-                newNode.next = first;
-                first = newNode;
-                size++;
-            } else {
-
-
-                for (int i = 1; i < index; i++) {
-                    tempNode = tempNode.next;
-                }
-
-                newNode.next = tempNode.next;
-                tempNode.next = newNode;
-                size++;
-            }
+            return;
         }
 
+        if (index == 0) {
+            newNode.next = first;
+            first = newNode;
+            return;
+
+        } else {
+
+            for (int i = 1; i < index; i++) {
+                tempNode = tempNode.next;
+            }
+
+            newNode.next = tempNode.next;
+            tempNode.next = newNode;
+
+        }
     }
 
     @Override
     public E remove(int index) {
-        if (index < 0 || index >= size()) {
-            throw new IndexOutOfBoundsException();
-        }
-
-        if (first == null) {
-            throw new IndexOutOfBoundsException();
-        }
 
         Node<E> tempNode = first;
+        E oldData;
 
-        // om index är 0
+        if (index < 0 || index >= size() || first == null) {
+            throw new IndexOutOfBoundsException();
+        }
+
         if (index == 0) {
-            // om
-            if (first == last) {
-                first = null;
-                last = null;
-                size--;
-                return tempNode.data;
-            } else {
 
+            if (size() == 1) {
+                clear();
+                return tempNode.data;
+
+            } else {
                 first = first.next;
-                size--;
                 return tempNode.data;
             }
-        }
 
-        for (int i = 0; i < index - 1; i++) {
-            tempNode = tempNode.next;
-        }
-
-        E oldData = tempNode.next.data;
-
-        if (tempNode.next == last) {
-            tempNode.next = null;
-            last = tempNode;
-            size--;
         } else {
 
-            tempNode.next = tempNode.next.next;
-            size--;
+            for (int i = 0; i < index - 1; i++) {
+                tempNode = tempNode.next;
+            }
+
+            oldData = tempNode.next.data;
+
+            if (tempNode.next == last) {
+                tempNode.next = null;
+                last = tempNode;
+
+            } else {
+                tempNode.next = tempNode.next.next;
+            }
+
+            return oldData;
         }
-
-        return oldData;
-
     }
 
     @Override
     public boolean remove(E element) {
+        // If the element is the first one
         if (first.data == element || first.data.equals(element)) {
-            if (first.next != null) {
-                first = first.next;
-                return true;
-            } else {
-                clear();
-                return true;
-            }
+            remove(0); //We call remove with index0
+            return true;
         }
 
         for (Node<E> temp = first; temp != null; temp = temp.next) {
@@ -156,16 +149,14 @@ public class MyALDAList<E> implements ALDAList<E> {
                     if (temp.next.next != null) {
                         temp.next = temp.next.next;
                         return true;
+
                     } else {
                         temp.next = null;
                         last = temp;
                         return true;
 
                     }
-
                 }
-
-
             }
         }
 
@@ -177,6 +168,7 @@ public class MyALDAList<E> implements ALDAList<E> {
         if (first == null) {
             throw new IndexOutOfBoundsException();
         }
+
         return getNode(index).data;
     }
 
@@ -188,19 +180,25 @@ public class MyALDAList<E> implements ALDAList<E> {
                 return true;
             }
         }
+
+        // Return false if not found
         return false;
     }
 
     @Override
     public int indexOf(E element) {
         int index = 0;
+
         for (Node<E> temp = first; temp != null; temp = temp.next) {
             if (temp.data == element || temp.data.equals(element)) {
                 return index;
+
+            } else {
+                index++;
             }
-            index++;
         }
 
+        //Return -1 if not found
         return -1;
 
     }
@@ -209,42 +207,47 @@ public class MyALDAList<E> implements ALDAList<E> {
     public void clear() {
         first = null;
         last = null;
-        size = 0;
-
     }
 
 
     @Override
     public int size() {
-        int siz = 0;
+        int size = 0;
         for (Node<E> temp = first; temp != null; temp = temp.next) {
-            siz++;
+            size++;
 
         }
-        return siz;
+        return size;
     }
 
     @Override
     public String toString() {
         Iterator<E> iter = iterator();
         StringBuilder builder = new StringBuilder();
+
         builder.append("[");
+
         while (iter.hasNext()) {
             builder.append(iter.next().toString());
+
             if (iter.hasNext()) {
                 builder.append(", ");
             }
         }
 
         builder.append("]");
+
         return builder.toString();
     }
+
+
+    // ------------ Iterator class --------------------------------------------
 
     private class MyALDAListIterator<T> implements Iterator<E> {
 
         Node<E> current = first;
         private Node<E> nextNode = first;
-        private boolean okToRemove =false;
+        private boolean okToRemove = false;
 
         @Override
         public boolean hasNext() {
@@ -258,6 +261,7 @@ public class MyALDAList<E> implements ALDAList<E> {
                 current = nextNode;
                 nextNode = nextNode.next;
                 okToRemove = true;
+
                 return current.data;
 
             } else throw new java.util.NoSuchElementException();
