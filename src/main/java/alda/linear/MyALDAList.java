@@ -60,8 +60,10 @@ public class MyALDAList<E> implements ALDAList<E> {
     }
 
     private void addFirstElement(E element) {
-        first = new Node<>(element);
-        last = first;
+        if (first == null) {
+            first = new Node<>(element);
+            last = first;
+        }
     }
 
     private void addToFront(E element) {
@@ -274,7 +276,7 @@ public class MyALDAList<E> implements ALDAList<E> {
 
         Node<E> current = first;
         private Node<E> nextNode = first;
-        private boolean okToRemove = false;
+        private boolean removable = false;
 
         @Override
         public boolean hasNext() {
@@ -287,7 +289,7 @@ public class MyALDAList<E> implements ALDAList<E> {
 
                 current = nextNode;
                 nextNode = nextNode.next;
-                okToRemove = true;
+                removable = true;
 
                 return current.data;
 
@@ -296,13 +298,13 @@ public class MyALDAList<E> implements ALDAList<E> {
 
         @Override
         public void remove() {
-            if (!okToRemove) {
+            if (removable) {
+                MyALDAList.this.remove(current.data);
+                removable = false;
+
+            } else {
                 throw new IllegalStateException();
             }
-
-            MyALDAList.this.remove(current.data);
-            okToRemove = false;
-
         }
     }
 }
