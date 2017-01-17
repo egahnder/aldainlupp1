@@ -234,6 +234,13 @@ public class ALDAListTest {
 	}
 
 	@Test
+	public void testRemoveObjectWithEmptyList() {
+		list.clear();
+		assertFalse(list.remove("Third"));
+
+	}
+
+	@Test
 	public void testRemoveObject() {
 		assertTrue(list.remove("Third"));
 		assertEquals("Second", list.get(1));

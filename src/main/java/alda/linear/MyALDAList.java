@@ -24,75 +24,81 @@ public class MyALDAList<E> implements ALDAList<E> {
 
     // --------------- Methods ------------------------------------------------
 
+
     @Override
     public Iterator<E> iterator() {
         return new MyALDAListIterator<>();
     }
 
-    private Node<E> getNode(int index) {
-
-        Node<E> tempNode = first;
-
-        if (index < 0 || index >= size()) {
-            throw new IndexOutOfBoundsException();
-        }
-
-        if (index == 0) {
-            return first;
-        }
-
-        for (int i = 0; i < index; i++) {
-            tempNode = tempNode.next;
-        }
-
-        return tempNode;
-
-    }
-
     @Override
     public void add(E element) {
-        if (first == null) {
-            first = new Node<>(element);
-            last = first;
-
-        } else {
-            last.next = new Node<>(element);
-            last = last.next;
-        }
+            addToBack(element);
 
     }
 
     @Override
     public void add(int index, E element) {
 
-        Node<E> newNode = new Node<>(element);
-        Node<E> tempNode = first;
-
         if (index < 0 || index > size()) {
             throw new IndexOutOfBoundsException();
         }
 
         if (index == size()) {
-            add(element);
+            addToBack(element);
             return;
         }
 
         if (index == 0) {
-            newNode.next = first;
-            first = newNode;
+            addToFront(element);
             return;
 
         } else {
 
-            for (int i = 1; i < index; i++) {
-                tempNode = tempNode.next;
-            }
-
-            newNode.next = tempNode.next;
-            tempNode.next = newNode;
+            addToMiddle(index, element);
 
         }
     }
+
+    private void addFirstElement(E element) {
+        first = new Node<>(element);
+        last = first;
+    }
+
+    private void addToFront(E element) {
+        if (first == null) {
+            addFirstElement(element);
+
+        } else {
+
+            Node<E> newNode = new Node<>(element);
+            newNode.next = first;
+            first = newNode;
+        }
+    }
+
+    private void addToMiddle(int index, E element) {
+        Node<E> newNode = new Node<>(element);
+        Node<E> tempNode = first;
+
+        for (int i = 1; i < index; i++) {
+            tempNode = tempNode.next;
+        }
+
+        newNode.next = tempNode.next;
+        tempNode.next = newNode;
+    }
+
+    private void addToBack(E element) {
+        if (first == null) {
+            addFirstElement(element);
+
+        } else {
+        last.next = new Node<>(element);
+        last = last.next;
+
+        }
+    }
+
 
     @Override
     public E remove(int index) {
@@ -137,6 +143,10 @@ public class MyALDAList<E> implements ALDAList<E> {
 
     @Override
     public boolean remove(E element) {
+        if (size() == 0) {
+            return false;
+        }
+
         // If the element is the first one
         if (first.data == element || first.data.equals(element)) {
             remove(0); //We call remove with index0
@@ -165,11 +175,28 @@ public class MyALDAList<E> implements ALDAList<E> {
 
     @Override
     public E get(int index) {
-        if (first == null) {
+
+        return getNode(index).data;
+    }
+
+    private Node<E> getNode(int index) {
+
+        if (index < 0 || index >= size() || first == null) {
             throw new IndexOutOfBoundsException();
         }
 
-        return getNode(index).data;
+        Node<E> tempNode = first;
+
+        if (index == 0) {
+            return first;
+        }
+
+        for (int i = 0; i < index; i++) {
+            tempNode = tempNode.next;
+        }
+
+        return tempNode;
+
     }
 
     @Override
