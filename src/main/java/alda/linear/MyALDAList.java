@@ -13,8 +13,33 @@ public class MyALDAList<E> implements ALDAList<E> {
         }
     }
 
+    private class MyALDAListIterator<E> implements java.util.Iterator<E> {
+
+        private int current = 0;
+
+        @Override
+        public boolean hasNext() {
+            return current < size();
+        }
+
+        @Override
+        public E next() {
+            if (!hasNext()) {
+                throw new java.util.NoSuchElementException();
+            } else {
+                return next();
+            }
+        }
+
+        @Override
+        public void remove() {
+
+        }
+    }
+
     private Node<E> first;
     private Node<E> last;
+    private int size;
 
     @Override
     public Iterator<E> iterator() {
@@ -26,9 +51,11 @@ public class MyALDAList<E> implements ALDAList<E> {
         if (first == null) {
             first = new Node<>(element);
             last = first;
+            size = 1;
         } else {
             last.next = new Node<>(element);
             last = last.next;
+            size +=1;
 
         }
 
@@ -71,7 +98,11 @@ public class MyALDAList<E> implements ALDAList<E> {
 
     @Override
     public int size() {
-        return 0;
+        return size;
+    }
+
+    private Node next() {
+        return Node.next;
     }
 
 
