@@ -1,3 +1,10 @@
+/*
+
+Tobias Ahnhem - toah5501
+Daniel Andersson- daan2233
+Eric Egan - ereg8941
+ */
+
 package alda.linear;
 
 import java.util.Iterator;
@@ -5,6 +12,7 @@ import java.util.Iterator;
 public class MyALDAList<E> implements ALDAList<E> {
 
     // --------------- The Node class -----------------------------------------
+
     private static class Node<E> {
         E data;
         Node<E> next;
@@ -15,7 +23,7 @@ public class MyALDAList<E> implements ALDAList<E> {
     }
 
 
-    // --------------- MyADLAList class ---------------------------------------
+    // --------------- MyALDAList class ---------------------------------------
 
     // --------------- Variables ----------------------------------------------
 
