@@ -6,44 +6,20 @@ public class MyALDAList<E> implements ALDAList<E> {
 
     private static class Node<E> {
         E data;
-        Node next;
+        Node<E> next;
 
         public Node(E data) {
             this.data = data;
         }
     }
 
-    private class MyALDAListIterator<E> implements java.util.Iterator<E> {
-
-        private int current = 0;
-
-        @Override
-        public boolean hasNext() {
-            return current < size();
-        }
-
-        @Override
-        public E next() {
-            if (!hasNext()) {
-                throw new java.util.NoSuchElementException();
-            } else {
-                return next();
-            }
-        }
-
-        @Override
-        public void remove() {
-
-        }
-    }
-
     private Node<E> first;
     private Node<E> last;
-    private int size;
+    private int size = 0;
 
     @Override
     public Iterator<E> iterator() {
-        return null;
+        return new MyALDAListIterator<>();
     }
 
 
@@ -51,23 +27,43 @@ public class MyALDAList<E> implements ALDAList<E> {
         if (first == null) {
             first = new Node<>(element);
             last = first;
-            size = 1;
+            size++;
+
         } else {
             last.next = new Node<>(element);
             last = last.next;
-            size +=1;
-
+            size++;
         }
 
     }
 
     @Override
     public void add(int index, E element) {
+        if (index < 0 || index > size()) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        Node<E> newNode = new Node<>(element);
+        Node<E> tempNode = first;
+
+
+        for (int i = 0; i < index; i++) {
+            tempNode = tempNode.next;
+        }
+
+        newNode.next = tempNode.next;
+        tempNode.next = newNode;
+        size++;
+
+
 
     }
 
     @Override
     public E remove(int index) {
+        if (index < 0 || index > size()) {
+            throw new IndexOutOfBoundsException();
+        }
         return null;
     }
 
@@ -83,6 +79,12 @@ public class MyALDAList<E> implements ALDAList<E> {
 
     @Override
     public boolean contains(E element) {
+
+        for(Node<E> temp=first; temp!=null; temp=temp.next) {
+            if(temp.data== element || temp.data.equals(element)) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -96,14 +98,36 @@ public class MyALDAList<E> implements ALDAList<E> {
 
     }
 
+
     @Override
     public int size() {
         return size;
     }
 
-    private Node next() {
-        return Node.next;
+
+    private class MyALDAListIterator<E> implements Iterator<E> {
+
+        private Node<E> nextNode = (Node<E>) first;
+
+        @Override
+        public boolean hasNext() {
+            return nextNode != null;
+        }
+
+        @Override
+        public E next() {
+            if (hasNext()) {
+
+                Node<E> temp = nextNode;
+                nextNode = nextNode.next;
+                return temp.data;
+
+            } else throw new java.util.NoSuchElementException();
+        }
+
+        @Override
+        public void remove() {
+
+        }
     }
-
-
 }
