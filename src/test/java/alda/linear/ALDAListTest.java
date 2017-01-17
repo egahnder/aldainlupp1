@@ -110,6 +110,8 @@ public class ALDAListTest {
 		assertEquals("Second", list.get(5));
 	}
 
+
+
 	@Test(expected = IndexOutOfBoundsException.class)
 	public void testIndexBelowZero() {
 		list.get(-1);
@@ -237,6 +239,7 @@ public class ALDAListTest {
 		assertEquals("Second", list.get(1));
 		assertEquals("Fourth", list.get(2));
 
+		assertEquals("First", list.get(0));
 		list.remove("First");
 		assertEquals(3, list.size());
 		assertEquals("Second", list.get(0));
@@ -406,6 +409,7 @@ public class ALDAListTest {
 
 	}
 
+
 	@Test
 	public void testIsItearble() {
 		for (String s : list)
@@ -509,5 +513,7 @@ public class ALDAListTest {
 		assertEquals(new Integer(5), l.get(0));
 		assertEquals(new Integer(10), l.get(1));
 	}
+
+
 
 }

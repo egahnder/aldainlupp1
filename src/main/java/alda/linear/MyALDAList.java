@@ -17,6 +17,27 @@ public class MyALDAList<E> implements ALDAList<E> {
     private Node<E> last;
     private int size = 0;
 
+    private Node<E> getNode(int index) {
+
+        if (index < 0 || index >= size()) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        Node<E> tempNode = first;
+
+        if (index == 0) {
+            return first;
+        }
+
+        for (int i = 0; i < index; i++) {
+            tempNode = tempNode.next;
+        }
+
+        return tempNode;
+
+    }
+
+
     @Override
     public Iterator<E> iterator() {
         return new MyALDAListIterator<>();
@@ -43,45 +64,127 @@ public class MyALDAList<E> implements ALDAList<E> {
             throw new IndexOutOfBoundsException();
         }
 
-        Node<E> newNode = new Node<>(element);
-        Node<E> tempNode = first;
+        if (index == size()) {
+            add(element);
+        } else {
+
+            Node<E> newNode = new Node<>(element);
+            Node<E> tempNode = first;
+
+            if (index == 0) {
+                newNode.next = first;
+                first = newNode;
+                size++;
+            } else {
 
 
-        for (int i = 0; i < index; i++) {
-            tempNode = tempNode.next;
+                for (int i = 1; i < index; i++) {
+                    tempNode = tempNode.next;
+                }
+
+                newNode.next = tempNode.next;
+                tempNode.next = newNode;
+                size++;
+            }
         }
-
-        newNode.next = tempNode.next;
-        tempNode.next = newNode;
-        size++;
-
-
 
     }
 
     @Override
     public E remove(int index) {
-        if (index < 0 || index > size()) {
+        if (index < 0 || index >= size()) {
             throw new IndexOutOfBoundsException();
         }
-        return null;
+
+        if (first == null) {
+            throw new IndexOutOfBoundsException();
+        }
+
+        Node<E> tempNode = first;
+
+        // om index är 0
+        if (index == 0) {
+            // om
+            if (first == last) {
+                first = null;
+                last = null;
+                size--;
+                return tempNode.data;
+            } else {
+
+                first = first.next;
+                size--;
+                return tempNode.data;
+            }
+        }
+
+        for (int i = 0; i < index - 1; i++) {
+            tempNode = tempNode.next;
+        }
+
+        E oldData = tempNode.next.data;
+
+        if (tempNode.next == last) {
+            tempNode.next = null;
+            last = tempNode;
+            size--;
+        } else {
+
+            tempNode.next = tempNode.next.next;
+            size--;
+        }
+
+        return oldData;
+
     }
 
     @Override
     public boolean remove(E element) {
+        if (first.data == element || first.data.equals(element)) {
+            if (first.next != null) {
+                first = first.next;
+                return true;
+            } else {
+                clear();
+                return true;
+            }
+        }
+
+        for (Node<E> temp = first; temp != null; temp = temp.next) {
+            if (temp.next != null) {
+                if (temp.next.data == element || temp.next.data.equals(element)) {
+                    if (temp.next.next != null) {
+                        temp.next = temp.next.next;
+                        return true;
+                    } else {
+                        temp.next = null;
+                        last = temp;
+                        return true;
+
+                    }
+
+                }
+
+
+            }
+        }
+
         return false;
     }
 
     @Override
     public E get(int index) {
-        return null;
+        if (first == null) {
+            throw new IndexOutOfBoundsException();
+        }
+        return getNode(index).data;
     }
 
     @Override
     public boolean contains(E element) {
 
-        for(Node<E> temp=first; temp!=null; temp=temp.next) {
-            if(temp.data== element || temp.data.equals(element)) {
+        for (Node<E> temp = first; temp != null; temp = temp.next) {
+            if (temp.data == element || temp.data.equals(element)) {
                 return true;
             }
         }
@@ -90,24 +193,58 @@ public class MyALDAList<E> implements ALDAList<E> {
 
     @Override
     public int indexOf(E element) {
-        return 0;
+        int index = 0;
+        for (Node<E> temp = first; temp != null; temp = temp.next) {
+            if (temp.data == element || temp.data.equals(element)) {
+                return index;
+            }
+            index++;
+        }
+
+        return -1;
+
     }
 
     @Override
     public void clear() {
+        first = null;
+        last = null;
+        size = 0;
 
     }
 
 
     @Override
     public int size() {
-        return size;
+        int siz = 0;
+        for (Node<E> temp = first; temp != null; temp = temp.next) {
+            siz++;
+
+        }
+        return siz;
     }
 
+    @Override
+    public String toString() {
+        Iterator<E> iter = iterator();
+        StringBuilder builder = new StringBuilder();
+        builder.append("[");
+        while (iter.hasNext()) {
+            builder.append(iter.next().toString());
+            if (iter.hasNext()) {
+                builder.append(", ");
+            }
+        }
 
-    private class MyALDAListIterator<E> implements Iterator<E> {
+        builder.append("]");
+        return builder.toString();
+    }
 
-        private Node<E> nextNode = (Node<E>) first;
+    private class MyALDAListIterator<T> implements Iterator<E> {
+
+        Node<E> current = first;
+        private Node<E> nextNode = first;
+        private boolean okToRemove =false;
 
         @Override
         public boolean hasNext() {
@@ -118,15 +255,22 @@ public class MyALDAList<E> implements ALDAList<E> {
         public E next() {
             if (hasNext()) {
 
-                Node<E> temp = nextNode;
+                current = nextNode;
                 nextNode = nextNode.next;
-                return temp.data;
+                okToRemove = true;
+                return current.data;
 
             } else throw new java.util.NoSuchElementException();
         }
 
         @Override
         public void remove() {
+            if (!okToRemove) {
+                throw new IllegalStateException();
+            }
+
+            MyALDAList.this.remove(current.data);
+            okToRemove = false;
 
         }
     }
